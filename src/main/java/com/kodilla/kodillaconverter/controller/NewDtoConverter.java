@@ -1,7 +1,5 @@
 package com.kodilla.kodillaconverter.controller;
 
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.core.JsonFactoryBuilder;
 import com.kodilla.kodillaconverter.domain.MyCustomClass;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -28,7 +26,7 @@ public class NewDtoConverter implements HttpMessageConverter<Object> {
     @Override
     public boolean canWrite(Class<?> clazz, MediaType mediaType) {
         return clazz.getName().equals("com.kodilla.kodillaconverter.domain.MyCustomClass") &&
-                mediaType.getSubtype().equals("plain") && mediaType.getType().equals(MediaType.APPLICATION_JSON_VALUE);
+                mediaType.getSubtype().equals("plain") && mediaType.getType().equals("text");
     }
 
     @Override
@@ -37,7 +35,8 @@ public class NewDtoConverter implements HttpMessageConverter<Object> {
     }
 
     @Override
-    public Object read(Class<?> clazz, HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
+    public Object read(Class<?> clazz, HttpInputMessage inputMessage) throws IOException,
+            HttpMessageNotReadableException {
         StringBuilder builder = new StringBuilder();
         try(Reader reader = new BufferedReader(
                 new InputStreamReader(
@@ -48,13 +47,14 @@ public class NewDtoConverter implements HttpMessageConverter<Object> {
             while ((c = reader.read()) != -1)
                 builder.append((char) c);
         }
-        String[] s = builder.toString().split("]]");
+        String[] s = builder.toString().split("-");
 
         return new MyCustomClass(s[0], s[1], s[2]);
     }
 
     @Override
-    public void write(Object o, MediaType contentType, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
+    public void write(Object o, MediaType contentType, HttpOutputMessage outputMessage) throws IOException,
+            HttpMessageNotWritableException {
 
     }
 }
