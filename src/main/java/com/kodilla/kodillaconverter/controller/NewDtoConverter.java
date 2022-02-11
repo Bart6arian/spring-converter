@@ -1,5 +1,7 @@
 package com.kodilla.kodillaconverter.controller;
 
+import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
 import com.kodilla.kodillaconverter.domain.MyCustomClass;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -14,13 +16,14 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 
 public class NewDtoConverter implements HttpMessageConverter<Object> {
     @Override
     public boolean canRead(Class<?> clazz, MediaType mediaType) {
         return clazz.getName().equals("com.kodilla.kodillaconverter.domain.MyCustomClass") &&
-                mediaType.getSubtype().equals("plain") && mediaType.getType().equals(MediaType.APPLICATION_JSON_VALUE);
+                mediaType.getSubtype().equals("plain") && mediaType.getType().equals("text");
     }
 
     @Override
@@ -37,24 +40,15 @@ public class NewDtoConverter implements HttpMessageConverter<Object> {
     @Override
     public Object read(Class<?> clazz, HttpInputMessage inputMessage) throws IOException,
             HttpMessageNotReadableException {
-        StringBuilder builder = new StringBuilder();
-        try(Reader reader = new BufferedReader(
-                new InputStreamReader(
-                        inputMessage.getBody(),
-                        Charset.forName(StandardCharsets.US_ASCII.name())))) {
-            int c = 0;
 
-            while ((c = reader.read()) != -1)
-                builder.append(c);
-        }
-        String[] s = builder.toString().split("");
-
-        return new MyCustomClass(s[0], s[1], s[2]);
+        Gson gson = new Gson();
+        TypeAdapter<?> adapter = gson.getAdapter(clazz);
+        Object obj = adapter.fromJson(inputMessage.getBody().toString());
+        return obj;
     }
 
     @Override
     public void write(Object o, MediaType contentType, HttpOutputMessage outputMessage) throws IOException,
             HttpMessageNotWritableException {
-
     }
 }
