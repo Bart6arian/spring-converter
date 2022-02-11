@@ -47,7 +47,7 @@ public class NewDtoConverter implements HttpMessageConverter<Object> {
             while ((c = reader.read()) != -1)
                 builder.append(c);
         }
-        String[] s = builder.toString().split("-");
+        String[] s = builder.toString().split("");
 
         return new MyCustomClass(s[0], s[1], s[2]);
     }
